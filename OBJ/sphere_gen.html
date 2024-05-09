@@ -1,0 +1,186 @@
+<!doctype html>
+<html>
+<head>
+<title>Document</title>
+</head>
+
+<body>
+var verts2 = [
+<p id="verts"></p>
+];
+</br>
+</br>
+var polys2 = [
+<p id="polys"></p>
+];
+</br>
+</br>
+var tran2 = [[0,0,90],[90,0,0],[5,5,5]];
+</br>
+var object2 = new object(verts2,polys2,tran2,[ani1]);
+
+
+<script>
+
+var startVerts = [
+
+//verts
+
+//front face
+[0,-0.5,0.809],
+[0.809,0,0.5],
+[0.5,-0.809,0],
+
+//edge
+[-0.809,0,0.5],
+[0,0.5,0.809],
+[0.5,0.809,0],
+[0.809,0,-0.5],
+[0,-0.5,-0.809],
+[-0.5,-0.809,0],
+
+//back face
+[-0.5,0.809,0],
+[0,0.5,-0.809],
+[-0.809,0,-0.5]
+
+];
+
+var startPolys = [
+
+//polys
+
+//front face
+[0,1,2],
+
+//second layer
+[0,2,8],
+[0,4,1],
+[1,6,2],
+
+//third layer
+[0,8,3],
+[0,3,4],
+
+[1,4,5],
+[1,5,6],
+
+[2,6,7],
+[2,7,8],
+
+//back face
+[9,11,10],
+
+//second layer
+[3,11,9],
+[5,9,10],
+[7,10,11],
+
+//third layer
+[3,9,4],
+[4,9,5],
+
+[5,10,6],
+[6,10,7],
+
+[7,11,8],
+[3,8,11]
+
+];
+
+var newVerts = [];
+var newPolys = [];
+
+var tNumber = 3;
+
+function spherePoint(v) {
+	var x = v[0];
+	var y = v[1];
+	var z = v[2];
+	var dist = Math.sqrt(Math.pow(x,2) + Math.pow(y,2) + Math.pow(z,2));
+	return [Math.round((x/dist)*10000)/10000,Math.round((y/dist)*10000)/10000,Math.round((z/dist)*10000)/10000];
+}
+
+function midpoint(a,b) {
+	return [(a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2];
+}
+
+function testIndex(data) {
+	for (var i = 0; i < newVerts.length; i++) {
+		if (newVerts[i][0] == data[0] && newVerts[i][1] == data[1] && newVerts[i][2] == data[2]) {
+			return i;
+		}
+		else if (i == (newVerts.length - 1)) {
+			newVerts.push(data);
+			return newVerts.length - 1;
+		}
+	}
+}
+
+function normalize(n) {
+	var mag = Math.sqrt(Math.pow(n[0],2) + Math.pow(n[1],2) + Math.pow(n[2],2));
+	var N = [
+		Math.round(n[0] / mag * 255),
+		Math.round(n[1] / mag * 255),
+		Math.round(n[2] / mag * 255)
+	];
+	return N;
+}
+
+//make sure all start verts are on sphere
+for (var i = 0; i < startVerts.length; i++) {
+	var data = startVerts[i];
+	newVerts.push(spherePoint(data));
+}
+
+//loop for each tess
+for (var t = 0; t < tNumber; t++) {
+	//split polys
+	for (var p = 0; p < startPolys.length; p++) {
+		var poly = startPolys[p];
+		var a = poly[0];
+		var b = poly[1];
+		var c = poly[2];
+		var dData = spherePoint(midpoint(newVerts[a],newVerts[b]));
+		var eData = spherePoint(midpoint(newVerts[b],newVerts[c]));
+		var fData = spherePoint(midpoint(newVerts[c],newVerts[a]));
+		var d = testIndex(dData);
+		var e = testIndex(eData);
+		var f = testIndex(fData);
+		newPolys.push([e,d,f]);
+		newPolys.push([d,a,f]);
+		newPolys.push([e,b,d]);
+		newPolys.push([f,c,e]);
+	}
+	if (t != tNumber - 1) {
+		startPolys = newPolys;
+		newPolys = [];
+	}
+}
+if (tNumber == 0) {
+	newPolys = startPolys;
+}
+
+//formatting
+var colorScaler = 255 / newPolys.length;
+for (var i = 0; i < newPolys.length; i++) {
+	var a = newVerts[newPolys[i][0]];
+	var b = newVerts[newPolys[i][1]];
+	var c = newVerts[newPolys[i][2]];
+	var colorX = Math.round((((a[0]+b[0]+c[0])/3)+1)*127);
+	var colorY = Math.round((((a[1]+b[1]+c[1])/3)+1)*127);
+	var colorZ = Math.round((((a[2]+b[2]+c[2])/3)+1)*127);
+	var color = normalize([colorX,colorY,colorZ]);
+	newPolys[i] = "[" + newPolys[i] + ",[" + color[0] + "," + color[1] + "," + color[2] + "]]";
+}
+
+for (var i = 0; i < newVerts.length; i++) {
+	newVerts[i] = "[" + newVerts[i] + "]";
+}
+
+document.getElementById("verts").innerHTML = newVerts;
+document.getElementById("polys").innerHTML = newPolys;
+
+</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+html, body {
+width: 90%;
+height: 90%;
+}
+
+#canvas {
+width: 100vw;	
+height: 50vw;
+position: absolute;
+top: 0px;
+left: 0px;
+background-color: #000000;
+}
+
+#fps {
+position: absolute;
+top: 0px;
+left: 10px;
+color: #ffffff;
+font-family: monospace, sans-serif;
+}
+
+#mouse {
+position: absolute;
+top: 0px;
+left: 50px;
+color: #ffffff;
+font-family: monospace, sans-serif;
+}
