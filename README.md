@@ -8,3 +8,5 @@ Controls:
 - Use the mouse to look around
 - Use WASD, Space, and Shift to move
 - Press Esc to unlock your mouse
+
+![screenshot](screenshot.png)
